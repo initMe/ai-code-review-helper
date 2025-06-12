@@ -98,7 +98,8 @@ def _process_github_general_payload(access_token, owner, repo_name, pull_number,
             review_json_string=json.dumps([]) # Save empty list
         )
 
-    if app_configs.get("WECOM_BOT_WEBHOOK_URL"):
+    # 发送通知
+    if app_configs.get("WECOM_BOT_WEBHOOK_URL") or app_configs.get("CUSTOM_WEBHOOK_URL"):
         logger.info("GitHub (通用审查): 正在发送摘要通知到企业微信机器人...")
         num_files_with_issues = len(files_with_issues_details)
         total_files_checked = len(file_data_list)
@@ -217,7 +218,7 @@ def github_webhook_general():
     return jsonify({"message": "GitHub General Webhook processing task accepted."}), 202
 
 
-def _process_gitlab_general_payload(access_token, project_id_str, mr_iid, mr_attrs, final_position_info, head_sha_payload, current_commit_sha_for_ops, project_name_from_payload, project_web_url, mr_title, mr_url):
+def _process_gitlab_general_payload(access_token, project_id_str, mr_iid, mr_attrs, final_position_info, head_sha_payload, current_commit_sha_for_ops, project_name_from_payload, project_web_url, mr_title, mr_url, user):
     """实际处理 GitLab 通用审查的核心逻辑。"""
     logger.info("GitLab (通用审查): 正在获取 MR 数据 (diffs 和文件内容)...")
     file_data_list = get_gitlab_mr_data_for_general_review(project_id_str, mr_iid, access_token, mr_attrs, final_position_info)
@@ -297,7 +298,8 @@ def _process_gitlab_general_payload(access_token, project_id_str, mr_iid, mr_att
             project_name_for_gitlab=project_name_from_payload
         )
 
-    if app_configs.get("WECOM_BOT_WEBHOOK_URL"):
+    
+    if app_configs.get("WECOM_BOT_WEBHOOK_URL") or app_configs.get("CUSTOM_WEBHOOK_URL"):
         logger.info("GitLab (通用审查): 正在发送摘要通知到企业微信机器人...")
         num_files_with_issues = len(files_with_issues_details)
         total_files_checked = len(file_data_list)
@@ -310,9 +312,11 @@ def _process_gitlab_general_payload(access_token, project_id_str, mr_iid, mr_att
         mr_target_branch = mr_attrs.get('target_branch')
         summary_content = f"""**AI通用代码审查完成 (GitLab)**
 
-> 项目: [{project_name_from_payload or project_id_str}]({project_web_url})
-> MR: [{mr_title}]({mr_url}) (!{mr_iid}) 
-> 分支: `{mr_source_branch}` → `{mr_target_branch}`
+> 项目名称: [{project_name_from_payload or project_id_str}]
+> MR地址: [{mr_title}]({mr_url}) (!{mr_iid}) 
+> 合并分支: `{mr_source_branch}` → `{mr_target_branch}`
+> 申请人: [{user.get('name')}]
+> 审查模型: [{app_configs.get("OPENAI_MODEL")}]
 
 {summary_line}
 """
@@ -336,6 +340,9 @@ def gitlab_webhook_general():
         logger.error(f"解析 GitLab JSON 负载时出错 (粗粒度): {e}")
         abort(400, "无效的 JSON 负载")
 
+    # 获取用户信息
+    user_data = data.get('user', {})
+    # 获取项目信息
     project_data = data.get('project', {})
     project_id = project_data.get('id')
     project_web_url = project_data.get('web_url')
@@ -423,7 +430,8 @@ def gitlab_webhook_general():
         project_name_from_payload=project_name_from_payload,
         project_web_url=project_web_url,
         mr_title=mr_title,
-        mr_url=mr_url
+        mr_url=mr_url,
+        user=user_data
     )
     future.add_done_callback(handle_async_task_exception)
 

@@ -2,9 +2,6 @@
 
 一个基于 LLM 的自动化代码审查助手。通过 GitHub/GitLab Webhook 监听 PR/MR 变更，调用 AI 分析代码，并将审查意见自动评论到 PR/MR，同时支持多种通知渠道。
 
-[点击观看B站演示视频](https://www.bilibili.com/video/BV1TF7ozaEPv)
-> 由于 GitHub 的限制，无法直接嵌入视频播放器。
-
 ## 主要功能
 
 - **多平台支持**: 集成 GitHub 和 GitLab Webhook，监听 Pull Request / Merge Request 事件。
@@ -129,5 +126,4 @@ python -m unittest discover tests
 - **Redis 依赖**: 服务强依赖 Redis 进行配置和结果存储。
 
 ## 贡献
-本代码 90% 由 [Aider](https://github.com/Aider-AI/aider) + Gemini 协同完成。
 欢迎提交 Pull Request 或 Issue。

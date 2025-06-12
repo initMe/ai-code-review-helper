@@ -228,7 +228,7 @@ def save_review_results(vcs_type: str, identifier: str, pr_mr_id: str, commit_sh
             pipe.hset(redis_key, "_project_name", project_name)
         
         # 为审查结果设置过期时间，例如7天，以避免无限增长
-        pipe.expire(redis_key, 60 * 60 * 24 * 7) # 7 days
+        pipe.expire(redis_key, 60 * 60 * 24 * 1) # 7 days
         pipe.execute()
         
         log_msg = f"成功将 {vcs_type} {identifier} #{pr_mr_id} (commit: {commit_sha}) 的审查结果保存到 Redis。"

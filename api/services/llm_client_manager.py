@@ -11,7 +11,7 @@ def initialize_openai_client():
     """根据 app_configs 初始化或重新初始化全局 Azure OpenAI 客户端。"""
     global azure_openai_client
     try:
-        api_key = app_configs.get("AZURE_OPENAI_API_KEY", "xxx")
+        api_key = app_configs.get("AZURE_OPENAI_API_KEY", "GAYVJeRNwgxqA1ck88xuuyCTGaavjlyUroeXI6xPFRopkihmFOmHJQQJ99BDACHrzpqXJ3w3AAABACOG63NT")
         api_version = app_configs.get("AZURE_OPENAI_API_VERSION", "2024-05-01-preview")
         azure_endpoint = app_configs.get("AZURE_OPENAI_ENDPOINT", "https://aiyaya-llm-openai.openai.azure.com/")
         deployment_name = app_configs.get("AZURE_OPENAI_DEPLOYMENT_NAME", "gpt-4o-mini")

@@ -51,7 +51,8 @@ def send_notifications(summary_content):
     custom_webhook_url = app_configs.get("CUSTOM_WEBHOOK_URL")
     if custom_webhook_url:
         custom_payload = {
-            "content": summary_content  # 将通知内容放在 'content' 参数中
+            "msgtype": "text",
+            "text": {"content": summary_content},  # 将通知内容放在 'content' 参数中
         }
         _send_notification(custom_webhook_url, custom_payload, "自定义 Webhook")
     else:
